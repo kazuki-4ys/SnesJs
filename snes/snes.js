@@ -1,3 +1,7 @@
+function bytesToUint16(data,addr,isLE){
+  if(isLE)return (data[addr + 1] << 8) + data[addr];
+  return (data[addr] << 8) + data[addr + 1];
+}
 
 function Snes() {
 
@@ -875,18 +879,22 @@ function Snes() {
 
   // rom loading and header parsing
 
-  this.loadRom = function(rom, isHirom) {
+  this.loadRom = function(rom) {
     if(rom.length % 0x8000 === 0) {
       // no copier header
-      header = this.parseHeader(rom, isHirom);
     } else if((rom.length - 512) % 0x8000 === 0) {
       // 512-byte copier header
       rom = new Uint8Array(Array.prototype.slice.call(rom, 512));
-      header = this.parseHeader(rom, isHirom);
+      
     } else {
       log("Failed to load rom: Incorrect size - " + rom.length);
       return false;
     }
+    var isHirom = false;
+    if(rom.length > 0x8000){
+      if(bytesToUint16(rom, 0xFFDC, true) + bytesToUint16(rom, 0xFFDE, true) == 0xFFFF)isHirom = true;
+    }
+    header = this.parseHeader(rom, isHirom);
     // if(header.type !== 0) {
     //   log("Failed to load rom: not LoRom, type = " + getByteRep(
     //     (header.speed << 4) | header.type

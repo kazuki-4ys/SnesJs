@@ -115,13 +115,6 @@ el("runframe").onclick = function(e) {
   }
 }
 
-el("ishirom").onchange = function(e) {
-  if(loaded) {
-    // reload when switching from LoROM to HiROM
-    loadRom(romArr);
-  }
-}
-
 document.onvisibilitychange = function(e) {
   if(document.hidden) {
     pausedInBg = false;
@@ -138,8 +131,7 @@ document.onvisibilitychange = function(e) {
 }
 
 function loadRom(rom) {
-  let hiRom = el("ishirom").checked;
-  if(snes.loadRom(rom, hiRom)) {
+  if(snes.loadRom(rom)) {
     snes.reset(true);
     if(!loaded && !paused) {
       loopId = requestAnimationFrame(update);
