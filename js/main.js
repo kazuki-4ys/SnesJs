@@ -14,7 +14,7 @@ let romArr = new Uint8Array([]);
 
 let snes = new Snes();
 
-let audioHandler = new AudioHandler();
+var audioHandler = null;
 
 let logging = false;
 let noPpu = false;
@@ -38,7 +38,7 @@ let controlsP1 = {
 }
 
 el("rom").onchange = function(e) {
-  //audioHandler.resume();
+  if(audioHandler === null)audioHandler = new AudioHandler();
   let freader = new FileReader();
   freader.onload = function() {
     let buf = freader.result;
@@ -90,12 +90,12 @@ el("rom").onchange = function(e) {
 el("pause").onclick = function() {
   if(paused && loaded) {
     loopId = requestAnimationFrame(update);
-    audioHandler.start();
+    if(audioHandler !== null)audioHandler.start();
     paused = false;
     el("pause").textContent = "Pause";
   } else {
     cancelAnimationFrame(loopId);
-    audioHandler.stop();
+    if(audioHandler !== null)audioHandler.stop();
     paused = true;
     el("pause").textContent = "Continue";
   }
